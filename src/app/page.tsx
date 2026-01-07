@@ -1,4 +1,7 @@
 import About from "@/components/layout/about";
+import Record from "@/components/layout/record";
+import Contact from "@/components/layout/contact";
+import Hireme from "@/components/layout/hireme";
 export default function Home() {
   return(
     <>
@@ -17,15 +20,18 @@ export default function Home() {
 
             <div className="column-2 image">
               <img
-                src="assets/Profile.svg"
+                src="/public/sadip.png"
                 className="points points2"
                 alt=""
               />
-              <img src="assets/Profile.svg" className="img-element z-index" alt="" />
+              <img src="/public/sadip.png" className="img-element z-index" alt="" />
             </div>
           </div>
         </div>
     <About/>
+    <Record/>
+    <Contact/>
+    <Hireme/>
     </>
   );
  

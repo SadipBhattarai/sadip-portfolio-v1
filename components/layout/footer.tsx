@@ -64,7 +64,7 @@ export default function Footer(){
           <div className="copyright">
             <p className="text">
               Copyright&copy;2023 All rights reserved | Made by
-              <span>Sadip Bhattarai</span>
+              <span> Sadip Bhattarai</span>
             </p> 
           </div>
           <div className="followme-wrap">
