@@ -27,14 +27,14 @@ export default function Record(){
 
           <div className="wrap">
             <div className="record-circle active">
-              <h2 className="number" data-num="10">6</h2>
+              <h2 className="number" data-num="10">12</h2>
               <h4 className="sub-title">Happy Clients</h4>
             </div>
           </div>
 
           <div className="wrap">
             <div className="record-circle">
-              <h2 className="number" data-num="128">4000</h2>
+              <h2 className="number" data-num="128">6000</h2>
               <h4 className="sub-title">Work Hour</h4>
             </div>
           </div>
