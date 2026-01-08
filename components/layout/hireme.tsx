@@ -7,7 +7,7 @@ export default function Hireme(){
           <p className="text">
             Let&apos;s make your vision come true.
           </p>
-          <a href="#hireme" className="btn">Hire me</a>
+          <a href="https://wa.me/+9779700593239" className="btn">Hire me</a>
         </div>
       </section>
         </>

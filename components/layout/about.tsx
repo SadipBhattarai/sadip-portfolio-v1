@@ -17,19 +17,19 @@ export default function About(){
                 <div className="skill html">
                   <h3 className="skill-title">Illustrator</h3>
                   <div className="skill-bar">
-                    <div className="skill-progress" style={{ width: "90%" }} />
+                    <div className="skill-progress" data-progress="90%" />
                   </div>
                 </div>
                 <div className="skill css">
                   <h3 className="skill-title">Photoshop</h3>
                   <div className="skill-bar">
-                    <div className="skill-progress" style={{ width: "80%" }}></div>
+                    <div className="skill-progress" data-progress="80%"></div>
                   </div>
                 </div>
                 <div className="skill js">
                   <h3 className="skill-title">Indesign</h3>
                   <div className="skill-bar">
-                    <div className="skill-progress" style={{ width: "70%" }}></div>
+                    <div className="skill-progress" data-progress="60%"></div>
                   </div>
                 </div>
               </div>

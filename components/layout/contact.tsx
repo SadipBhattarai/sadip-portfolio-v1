@@ -1,8 +1,22 @@
+"use client";
+
+import { useContactForm } from "./useContactForms";
+
 export default function Contact() {
+  const { formRef, handleSubmit, status } = useContactForm();
+
+  function getButtonText() {
+    if (status === "loading") return "Sending...";
+    if (status === "success") return "Submited";
+    if (status === "error") return "Failed";
+    return "Send";
+  }
+
   return (
     <section className="contact" id="contact">
       <div className="container">
         <div className="contact-box">
+          {/* LEFT: contact info (restored) */}
           <div className="contact-info">
             <h3 className="title">Get in touch</h3>
             <p className="text">What do you have in Mind?</p>
@@ -33,13 +47,12 @@ export default function Contact() {
             </div>
           </div>
 
+          {/* RIGHT: form */}
           <div className="contact-form">
             <h3 className="title">Contact me</h3>
 
-            <form
-              action="https://api.web3forms.com/submit"
-              method="POST"
-            >
+            <form ref={formRef} onSubmit={handleSubmit}>
+              {/* Web3Forms required hidden fields */}
               <input
                 type="hidden"
                 name="access_key"
@@ -51,15 +64,19 @@ export default function Contact() {
                 value="New message from your Website"
               />
               <input
+                type="hidden"
+                name="from_name"
+                value="Contact Initiated"
+              />
+
+              {/* honeypot */}
+              <input
                 type="checkbox"
                 name="botcheck"
                 className="hidden"
                 style={{ display: "none" }}
-              />
-              <input
-                type="hidden"
-                name="from_name"
-                value="Contact Initiated"
+                tabIndex={-1}
+                aria-hidden="true"
               />
 
               <div className="row">
@@ -94,11 +111,17 @@ export default function Contact() {
                   name="message"
                   className="contact-input textarea"
                   placeholder="Message"
+                  required
                 ></textarea>
               </div>
 
-              <button type="submit" className="submit-btn" name="submit">
-                Send
+              {/* IMPORTANT: use your existing .btn styles */}
+              <button
+                type="submit"
+                className="submit-btn"
+                disabled={status === "loading"}
+              >
+                {getButtonText()}
               </button>
             </form>
           </div>

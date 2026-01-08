@@ -1,4 +1,5 @@
-
+import Image from "next/image";
+import Link from "next/link";
 export default function Header(){
     return(
     <>
@@ -6,6 +7,15 @@ export default function Header(){
         <nav>
           <div className="container">
             <div className="logo">
+              <Link href="/">
+              <Image
+                src="/logo.png"
+                alt="Sadip Bhattarai Logo"
+                width={80}
+                height={80}
+                priority
+              />
+            </Link>
               
             </div>
 
