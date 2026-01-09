@@ -40,8 +40,10 @@ ul {
 }
 
 img {
-  width: 100%;
+  max-width: 100%;
+  height: auto;
 }
+
 
 .container {
   position: relative;
@@ -441,10 +443,30 @@ nav.open .links {
   margin: 2.15rem 0;
 }
 
-.header-content .image .img-element {
-  max-width: 750px;
-  border-radius: 50%;
+
+
+.header-content .column-2.image {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
+
+/* The wrapper that controls the hero image size */
+.header-content .profile-img {
+  position: relative;
+  width: 750px;
+  height: 750px;
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+.header-content .profile-img img {
+  object-fit: cover;
+}
+
+
+
 
 header .points1 {
   width: 420px;
@@ -1122,9 +1144,7 @@ header .circle {
     width: 11%;
   }
 
-  .header-content .image .img-element {
-    max-width: 500px;
-  }
+ 
 
   nav .container {
     height: 4.5rem;
@@ -1839,3 +1859,31 @@ header .circle {
 
 /* End Responsive */
 
+@media (max-width: 1280px) {
+  .header-content .profile-img {
+    width: 500px;
+    height: 500px;
+  }
+}
+
+@media (max-width: 850px) {
+  .header-content .profile-img {
+    width: 320px;
+    height: 320px;
+    margin: 0 auto;
+  }
+}
+
+@media (max-width: 560px) {
+  .header-content .profile-img {
+    width: 350px;
+    height: 350px;
+  }
+}
+
+@media (max-width: 375px) {
+  .header-content .profile-img {
+    width: 250px;
+    height: 250px;
+  }
+}

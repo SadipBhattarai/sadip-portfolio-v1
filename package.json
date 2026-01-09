@@ -19,6 +19,7 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@types/isotope-layout": "^3.0.15",
     "@types/jquery": "^3.5.33",
     "@types/node": "^20",
     "@types/react": "^19",

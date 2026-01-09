@@ -23,10 +23,10 @@ export function useContactForm() {
       const email = String(formData.get("email") || "");
       const message = String(formData.get("message") || "");
 
-      // ✅ Email subject with name
+      // Email subject with name
       formData.set("subject", `New message from ${name || "Website Visitor"}`);
 
-      // 1️⃣ Send Email
+      // Send Email
       const emailRes = await fetch("https://api.web3forms.com/submit", {
         method: "POST",
         body: formData,
@@ -38,7 +38,7 @@ export function useContactForm() {
         throw new Error("Email failed");
       }
 
-      // 2️⃣ Send WhatsApp
+      // Send WhatsApp
       const waRes = await fetch("/api/whatsapp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },

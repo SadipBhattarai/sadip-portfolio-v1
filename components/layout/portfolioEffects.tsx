@@ -1,19 +1,32 @@
 "use client";
 
 import { useEffect } from "react";
-import Isotope from "isotope-layout";
-import Swiper from "swiper/bundle";
 import "swiper/css/bundle";
+
+type IsotopeType = new (
+  element: Element | string,
+  options?: {
+    itemSelector?: string;
+    layoutMode?: string;
+    transitionDuration?: string;
+  }
+) => {
+  arrange: (opts: { filter: string }) => void;
+  destroy: () => void;
+};
 
 export default function PortfolioEffects() {
   useEffect(() => {
+    let isoInstance: { destroy: () => void; arrange: (opts: { filter: string }) => void } | null = null;
+    let swiperInstance: { destroy: (deleteInstance?: boolean, cleanStyles?: boolean) => void } | null = null;
+
     // ---------- Footer input focus ----------
     const footerInput = document.querySelector<HTMLInputElement>(".footer-input");
 
     const onFocus = () => footerInput?.classList.add("focus");
     const onBlur = () => {
       if (!footerInput) return;
-      if (footerInput.value !== "") return;
+      if (footerInput.value.trim() !== "") return;
       footerInput.classList.remove("focus");
     };
 
@@ -21,9 +34,9 @@ export default function PortfolioEffects() {
     footerInput?.addEventListener("blur", onBlur);
 
     // ---------- Hamburger menu ----------
-    const hamburger = document.querySelector(".hamburger-menu");
-    const navbar = document.querySelector("header nav");
-    const links = document.querySelectorAll(".links a");
+    const hamburger = document.querySelector<HTMLElement>(".hamburger-menu");
+    const navbar = document.querySelector<HTMLElement>("header nav");
+    const links = Array.from(document.querySelectorAll<HTMLAnchorElement>(".links a"));
 
     const closeMenu = () => {
       navbar?.classList.remove("open");
@@ -32,55 +45,28 @@ export default function PortfolioEffects() {
 
     const toggleMenu = () => {
       if (!navbar) return;
-      if (!navbar.classList.contains("open")) {
-        navbar.classList.add("open");
-        document.body.classList.add("stop-scrolling");
-      } else {
-        closeMenu();
-      }
+      navbar.classList.toggle("open");
+      document.body.classList.toggle("stop-scrolling");
     };
 
     hamburger?.addEventListener("click", toggleMenu);
     links.forEach((a) => a.addEventListener("click", closeMenu));
 
-    // ---------- Isotope filtering ----------
-    const gridEl = document.querySelector(".grid");
-    let iso: Isotope | null = null;
+    // ---------- Scroll effects (skills + records) ----------
+    const skillsWrap = document.querySelector<HTMLElement>(".skills");
+    const skillBars = Array.from(document.querySelectorAll<HTMLElement>(".skill-progress"));
 
-    if (gridEl) {
-      iso = new Isotope(gridEl, {
-        itemSelector: ".grid-item",
-        layoutMode: "fitRows",
-        transitionDuration: "0.6s",
-      });
+    const recordsWrap = document.querySelector<HTMLElement>(".records");
+    const recordNums = Array.from(document.querySelectorAll<HTMLElement>(".number"));
 
-      const filterBtns = document.querySelectorAll<HTMLButtonElement>(".filter-btn");
-      filterBtns.forEach((btn) => {
-        btn.addEventListener("click", () => {
-          filterBtns.forEach((b) => b.classList.remove("active"));
-          btn.classList.add("active");
-
-          const filterValue = btn.dataset.filter || "*";
-          iso?.arrange({ filter: filterValue });
-        });
-      });
-    }
-
-    // ---------- Scroll effects ----------
-    const skillsWrap = document.querySelector(".skills");
-    const skillBars = document.querySelectorAll<HTMLElement>(".skill-progress");
-    const recordsWrap = document.querySelector(".records");
-    const recordNums = document.querySelectorAll<HTMLElement>(".number");
-
-    const checkScroll = (el: Element | null) => {
+    const inView = (el: HTMLElement | null) => {
       if (!el) return false;
       const rect = el.getBoundingClientRect();
-      // same logic as your file
-      return window.innerHeight >= rect.top + (el as HTMLElement).offsetHeight;
+      return rect.top <= window.innerHeight * 0.85;
     };
 
     const skillsEffect = () => {
-      if (!checkScroll(skillsWrap)) return;
+      if (!inView(skillsWrap)) return;
       skillBars.forEach((bar) => {
         const p = bar.dataset.progress;
         if (p) bar.style.width = p;
@@ -88,13 +74,18 @@ export default function PortfolioEffects() {
     };
 
     const countUp = () => {
-      if (!checkScroll(recordsWrap)) return;
+      if (!inView(recordsWrap)) return;
 
       recordNums.forEach((n) => {
+        // Prevent re-running
+        if (n.dataset.started === "true") return;
+        n.dataset.started = "true";
+
         const maxNum = Number(n.dataset.num || "0");
-        let current = Number(n.innerText || "0");
-        const speed = 100;
-        const increment = Math.ceil(maxNum / speed);
+        let current = 0;
+
+        const speed = 80;
+        const increment = Math.max(1, Math.ceil(maxNum / speed));
 
         const update = () => {
           current += increment;
@@ -103,11 +94,10 @@ export default function PortfolioEffects() {
             return;
           }
           n.innerText = String(current);
-          setTimeout(update, 10);
+          window.setTimeout(update, 12);
         };
 
-        // only start if still 0
-        if (Number(n.innerText) === 0) update();
+        update();
       });
     };
 
@@ -117,15 +107,47 @@ export default function PortfolioEffects() {
     };
 
     window.addEventListener("scroll", onScroll);
-    // run once on load
     onScroll();
 
-    // ---------- Swiper ----------
-    let swiper: Swiper | null = null;
-    const swiperContainer = document.querySelector(".swiper-container");
+    // ---------- Isotope filtering (dynamic import) ----------
+    const initIsotope = async () => {
+      const gridEl = document.querySelector<HTMLElement>(".grid");
+      if (!gridEl) return;
 
-    if (swiperContainer) {
-      swiper = new Swiper(".swiper-container", {
+      const mod = await import("isotope-layout");
+      const Isotope = (mod.default ?? mod) as unknown as IsotopeType;
+
+      isoInstance = new Isotope(gridEl, {
+        itemSelector: ".grid-item",
+        layoutMode: "fitRows",
+        transitionDuration: "0.6s",
+      });
+
+      const filterBtns = Array.from(document.querySelectorAll<HTMLButtonElement>(".filter-btn"));
+
+      const onFilterClick = (btn: HTMLButtonElement) => {
+        filterBtns.forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+        const filterValue = btn.dataset.filter || "*";
+        isoInstance?.arrange({ filter: filterValue });
+      };
+
+      filterBtns.forEach((btn) => {
+        btn.addEventListener("click", () => onFilterClick(btn));
+      });
+    };
+
+    // ---------- Swiper (dynamic import) ----------
+    const initSwiper = async () => {
+      const swiperContainer = document.querySelector(".swiper-container");
+      if (!swiperContainer) return;
+
+      const mod = await import("swiper/bundle");
+      const Swiper = (mod.default ?? mod) as unknown as new (selector: string, options: unknown) => {
+        destroy: (deleteInstance?: boolean, cleanStyles?: boolean) => void;
+      };
+
+      swiperInstance = new Swiper(".swiper-container", {
         speed: 1100,
         slidesPerView: 1,
         loop: true,
@@ -135,7 +157,10 @@ export default function PortfolioEffects() {
           nextEl: ".swiper-button-next",
         },
       });
-    }
+    };
+
+    initIsotope();
+    initSwiper();
 
     // ---------- Cleanup ----------
     return () => {
@@ -147,8 +172,8 @@ export default function PortfolioEffects() {
 
       window.removeEventListener("scroll", onScroll);
 
-      swiper?.destroy(true, true);
-      iso?.destroy();
+      swiperInstance?.destroy(true, true);
+      isoInstance?.destroy();
     };
   }, []);
 
